@@ -1,0 +1,223 @@
+import pickle
+from datetime import datetime
+from typing import List, Dict, Optional
+
+# Define the Employee superclass
+class Employee:
+    def __init__(self, name: str, employee_id: int, department: str, job_title: str, basic_salary: float, age: int, date_of_birth: datetime, passport_details: str, manager_id: Optional[int] = None):
+        self.name = name
+        self.employee_id = employee_id
+        self.department = department
+        self.job_title = job_title
+        self.basic_salary = basic_salary
+        self.age = age
+        self.date_of_birth = date_of_birth
+        self.passport_details = passport_details
+        self.manager_id = manager_id  # ID of the manager (Employee who is the manager)
+
+    def display(self):
+        manager_info = f", Manager ID: {self.manager_id}" if self.manager_id else ""
+        return f"Employee ID: {self.employee_id}, Name: {self.name}, Department: {self.department}, Job Title: {self.job_title}, Basic Salary: {self.basic_salary}{manager_info}"
+
+# Define the Client class
+class Client:
+    def __init__(self, client_id: int, name: str, address: str, contact_details: str, budget: float):
+        self.client_id = client_id
+        self.name = name
+        self.address = address
+        self.contact_details = contact_details
+        self.budget = budget
+
+    def display(self):
+        return f"Client ID: {self.client_id}, Name: {self.name}, Address: {self.address}, Budget: {self.budget}"
+
+# Define the Guest class
+class Guest:
+    def __init__(self, guest_id: int, name: str, address: str, contact_details: str):
+        self.guest_id = guest_id
+        self.name = name
+        self.address = address
+        self.contact_details = contact_details
+
+    def display(self):
+        return f"Guest ID: {self.guest_id}, Name: {self.name}, Address: {self.address}"
+
+# Define the Supplier class
+class Supplier:
+    def __init__(self, supplier_id: int, name: str, address: str, contact_details: str, service_type: str):
+        self.supplier_id = supplier_id
+        self.name = name
+        self.address = address
+        self.contact_details = contact_details
+        self.service_type = service_type
+
+    def display(self):
+        return f"Supplier ID: {self.supplier_id}, Name: {self.name}, Service Type: {self.service_type}"
+
+# Define the Venue class
+class Venue:
+    def __init__(self, venue_id: int, name: str, address: str, contact: str, min_guests: int, max_guests: int):
+        self.venue_id = venue_id
+        self.name = name
+        self.address = address
+        self.contact = contact
+        self.min_guests = min_guests
+        self.max_guests = max_guests
+
+    def display(self):
+        return f"Venue ID: {self.venue_id}, Name: {self.name}, Address: {self.address}, Capacity: {self.min_guests}-{self.max_guests}"
+
+# Define the Event class
+class Event:
+    def __init__(self, event_id: int, event_type: str, theme: str, date: datetime, time: str, duration: int, venue_address: str, client_id: int, guest_list: List[int], suppliers: Dict[str, List[int]], invoice: float):
+        self.event_id = event_id
+        self.event_type = event_type
+        self.theme = theme
+        self.date = date
+        self.time = time
+        self.duration = duration
+        self.venue_address = venue_address
+        self.client_id = client_id
+        self.guest_list = guest_list
+        self.suppliers = suppliers
+        self.invoice = invoice
+
+    def display(self):
+        return f"Event ID: {self.event_id}, Type: {self.event_type}, Theme: {self.theme}, Date: {self.date.strftime('%Y-%m-%d')}, Time: {self.time}, Duration: {self.duration} hours, Venue: {self.venue_address}, Invoice: ${self.invoice}"
+
+import pickle
+
+# Function to save data to a file
+def save_data(data, filename):
+    with open(filename, 'wb') as file:
+        pickle.dump(data, file)
+
+# Function to load data from a file
+def load_data(filename):
+    try:
+        with open(filename, 'rb') as file:
+            return pickle.load(file)
+    except FileNotFoundError:
+        return []
+
+# Examples of using these functions
+#save_data(employees, 'employees.pkl')
+#employees = load_data('employees.pkl')
+
+# Adding an Employee
+def add_employee(employee):
+    employees = load_data('employees.pkl')
+    employees.append(employee)
+    save_data(employees, 'employees.pkl')
+
+# Modifying an Employee
+def modify_employee(employee_id, attribute, new_value):
+    employees = load_data('employees.pkl')
+    for emp in employees:
+        if emp.employee_id == employee_id:
+            setattr(emp, attribute, new_value)
+            save_data(employees, 'employees.pkl')
+            return True
+    return False
+
+# Deleting an Employee
+def delete_employee(employee_id):
+    employees = load_data('employees.pkl')
+    employees = [emp for emp in employees if emp.employee_id != employee_id]
+    save_data(employees, 'employees.pkl')
+
+# Displaying an Employee
+def display_employee(employee_id):
+    employees = load_data('employees.pkl')
+    for emp in employees:
+        if emp.employee_id == employee_id:
+            print(emp.display())
+            return
+    print("Employee not found.")
+
+if __name__ == '__main__':
+    # Example Employee
+    new_employee = Employee("Jana Ahmed", 102, "Marketing", "Manager", 68000, 29, datetime(1991, 8, 15), "XY1234567")
+    add_employee(new_employee)  # Add to the database
+    display_employee(102)  # Display the added employee
+
+    # Modify an attribute
+    modify_employee(102, 'basic_salary', 70000)
+    display_employee(102)
+
+    # Delete an employee
+    delete_employee(102)
+    display_employee(102)  # This will show "Employee not found."
+
+import tkinter as tk
+from tkinter import simpledialog, messagebox
+
+root = tk.Tk()
+root.title('Event Management System')
+
+def create_initial_employees():
+    employees = [
+        Employee("Susan Meyers", 47899, "Sales", "Manager", 37500, 35, datetime.strptime("1983-11-19", "%Y-%m-%d"), "Passport_Susan", None),
+        Employee("Joy Rogers", 81774, "Sales", "Manager", 24000, 42, datetime.strptime("1978-05-06", "%Y-%m-%d"), "Passport_Joy", None),
+        Employee("Shyam Sundar", 11234, "Sales", "Salesperson", 20000, 28, datetime.strptime("1992-07-14", "%Y-%m-%d"), "Passport_Shyam", 47899),
+        Employee("Mariam Khalid", 98394, "Sales", "Salesperson", 20000, 30, datetime.strptime("1990-03-25", "%Y-%m-%d"), "Passport_Mariam", 81774),
+        Employee("Salma J Sam", 98637, "Sales", "Salesperson", 20000, 26, datetime.strptime("1994-12-01", "%Y-%m-%d"), "Passport_Salma", 47899)
+    ]
+    save_data(employees, 'employees.pkl')
+
+# Call this function to initialize the data store
+create_initial_employees()
+def find_employee(employee_id):
+    employees = load_data('employees.pkl')
+    for emp in employees:
+        if emp.employee_id == employee_id:
+            return emp
+    return None
+
+# Example of how to use this function
+employee = find_employee(47899)
+if employee:
+    print(employee.display())
+else:
+    print("Employee not found.")
+
+
+# GUI Function to Add an Employee
+def gui_add_employee():
+    name = simpledialog.askstring("Input", "Enter employee name:", parent=root)
+    employee_id = simpledialog.askinteger("Input", "Enter employee ID:", parent=root)
+    department = simpledialog.askstring("Input", "Enter department:", parent=root)
+    job_title = simpledialog.askstring("Input", "Enter job title:", parent=root)
+    basic_salary = simpledialog.askfloat("Input", "Enter basic salary:", parent=root)
+    age = simpledialog.askinteger("Input", "Enter age:", parent=root)
+    dob_str = simpledialog.askstring("Input", "Enter date of birth (YYYY-MM-DD):", parent=root)
+    dob = datetime.strptime(dob_str, "%Y-%m-%d")
+    passport_details = simpledialog.askstring("Input", "Enter passport details:", parent=root)
+    manager_id = simpledialog.askinteger("Input", "Enter manager ID (or leave blank):", parent=root)
+    employee = Employee(name, employee_id, department, job_title, basic_salary, age, dob, passport_details, manager_id)
+    add_employee(employee)
+    messagebox.showinfo("Info", "Employee added successfully!")
+
+# GUI Function to Display an Employee by ID
+def gui_display_employee():
+    employee_id = simpledialog.askinteger("Input", "Enter employee ID to display:", parent=root)
+    employee = find_employee(employee_id)
+    if employee:
+        messagebox.showinfo("Employee Details", employee.display())
+    else:
+        messagebox.showerror("Error", "Employee not found.")
+
+# Button to Add an Employee
+add_emp_btn = tk.Button(root, text="Add Employee", command=gui_add_employee)
+add_emp_btn.pack(pady=20)
+
+# Button to Display an Employee
+disp_emp_btn = tk.Button(root, text="Display Employee", command=gui_display_employee)
+disp_emp_btn.pack(pady=20)
+
+# Function to run the main loop of the GUI
+def run_gui():
+    root.mainloop()
+
+if __name__ == '__main__':
+    run_gui()
